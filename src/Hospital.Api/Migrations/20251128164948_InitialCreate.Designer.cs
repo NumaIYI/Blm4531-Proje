@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hospital.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251109142647_UpdateHospitalSchema")]
-    partial class UpdateHospitalSchema
+    [Migration("20251128164948_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,9 +52,22 @@ namespace Hospital.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Patients");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Address = "İstanbul",
+                            BirthDate = new DateTime(1990, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Phone = "5551234567",
+                            TCNo = "11111111111",
+                            UserId = 2
+                        });
                 });
 
             modelBuilder.Entity("Hospital.Api.Models.Prescription", b =>
@@ -88,6 +101,17 @@ namespace Hospital.Api.Migrations
                     b.HasIndex("VisitId");
 
                     b.ToTable("Prescriptions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2025, 9, 21, 10, 0, 0, 0, DateTimeKind.Utc),
+                            Dosage = "500mg",
+                            Instructions = "Günde 2 kez tok karnına",
+                            Medication = "Parol",
+                            VisitId = 1
+                        });
                 });
 
             modelBuilder.Entity("Hospital.Api.Models.User", b =>
@@ -115,11 +139,34 @@ namespace Hospital.Api.Migrations
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Username")
+                        .IsUnique();
+
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2025, 10, 1, 10, 0, 0, 0, DateTimeKind.Utc),
+                            FullName = "Dr. Ayşe Yılmaz",
+                            PasswordHash = "12345",
+                            Role = "Doctor",
+                            Username = "doktor1"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2025, 10, 1, 10, 0, 0, 0, DateTimeKind.Utc),
+                            FullName = "Mehmet Demir",
+                            PasswordHash = "12345",
+                            Role = "Patient",
+                            Username = "hasta1"
+                        });
                 });
 
             modelBuilder.Entity("Hospital.Api.Models.Visit", b =>
@@ -133,6 +180,14 @@ namespace Hospital.Api.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Diagnosis")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("PatientId")
                         .HasColumnType("int");
 
@@ -141,13 +196,24 @@ namespace Hospital.Api.Migrations
                     b.HasIndex("PatientId");
 
                     b.ToTable("Visits");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Date = new DateTime(2025, 9, 21, 10, 0, 0, 0, DateTimeKind.Utc),
+                            Diagnosis = "Migren",
+                            Notes = "Hafif baş ağrısı şikayetiyle geldi.",
+                            PatientId = 1
+                        });
                 });
 
             modelBuilder.Entity("Hospital.Api.Models.Patient", b =>
                 {
                     b.HasOne("Hospital.Api.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .WithOne("Patient")
+                        .HasForeignKey("Hospital.Api.Models.Patient", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });
@@ -177,6 +243,11 @@ namespace Hospital.Api.Migrations
             modelBuilder.Entity("Hospital.Api.Models.Patient", b =>
                 {
                     b.Navigation("Visits");
+                });
+
+            modelBuilder.Entity("Hospital.Api.Models.User", b =>
+                {
+                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("Hospital.Api.Models.Visit", b =>

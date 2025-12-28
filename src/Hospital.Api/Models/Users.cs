@@ -8,5 +8,7 @@ namespace Hospital.Api.Models
         public string Role { get; set; } 
         public string FullName { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        
+        public Patient? Patient { get; set; }
     }
 }

@@ -18,8 +18,8 @@ namespace Hospital.Api.Controllers
 		}
 	
 
-		[HttpPut("{id}")]
-		public async Task<IActionResult> UpdatePrescription(int id, [FromBody] PrescriptionDto updatedDto)
+		        [HttpPut("{id}")]
+		        [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Doctor")]		public async Task<IActionResult> UpdatePrescription(int id, [FromBody] PrescriptionDto updatedDto)
 		{
 			var prescription = await _context.Prescriptions.FindAsync(id);
 			if (prescription == null)
