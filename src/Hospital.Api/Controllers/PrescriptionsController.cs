@@ -45,4 +45,3 @@ namespace Hospital.Api.Controllers
 
 	}
 }
-

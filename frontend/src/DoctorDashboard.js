@@ -16,6 +16,7 @@ const DoctorDashboard = () => {
     const [prescriptionForm, setPrescriptionForm] = useState({ Id: null, Medication: "", Dosage: "", Instructions: "" });
     const [editingVisit, setEditingVisit] = useState(null);
     const [visitForm, setVisitForm] = useState({ diagnosis: '', notes: '' });
+    const [suggestion, setSuggestion] = useState(null);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -35,6 +36,22 @@ const DoctorDashboard = () => {
     useEffect(() => {
         fetchPatients();
     }, []);
+
+    useEffect(() => {
+        if (visitForm.diagnosis) {
+            const timer = setTimeout(async () => {
+                try {
+                    const res = await protectedAxios.get("/OneriAi/ai");
+                    setSuggestion(res.data.medicationName);
+                } catch (err) {
+                    console.error("Öneri alınamadı:", err);
+                }
+            }, 1000); 
+            return () => clearTimeout(timer);
+        } else {
+            setSuggestion(null);
+        }
+    }, [visitForm.diagnosis, protectedAxios]);
 
     const addPatient = async (e) => {
         e.preventDefault();
@@ -98,6 +115,7 @@ const DoctorDashboard = () => {
         setEditingPrescription(null); 
         setEditingVisit(visit);
         setVisitForm({ diagnosis: visit.diagnosis, notes: visit.notes });
+        setSuggestion(null);
     };
 
     const handleVisitUpdate = async () => {
@@ -123,6 +141,29 @@ const DoctorDashboard = () => {
 
     return (
         <div className="container mt-5">
+            {suggestion && (
+                <div style={{
+                    position: 'fixed',
+                    top: '20px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    backgroundColor: '#d1ecf1',
+                    color: '#0c5460',
+                    padding: '15px',
+                    borderRadius: '5px',
+                    zIndex: 1050,
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                }}>
+                    <strong>AI Önerisi:</strong> {suggestion}
+                    <button 
+                        type="button" 
+                        className="btn-close" 
+                        aria-label="Close" 
+                        onClick={() => setSuggestion(null)}
+                        style={{ marginLeft: '15px' }}
+                    ></button>
+                </div>
+            )}
             <h1 className="text-center mb-4 text-primary">Doktor Paneli - Hasta Yönetimi</h1>
             <p className="lead text-center mb-4">Hoş geldiniz, Dr. {user.fullName}.</p>
 
@@ -197,7 +238,7 @@ const DoctorDashboard = () => {
                             </div>
                             <div className="mb-3">
                                 <label className="form-label">Notlar (Notes)</label>
-                                <textarea className="form-control" rows="3" value={visitForm.notes} onChange={e => setVisitForm({ ...visitForm, notes: e.target.value })}></textarea>
+                                <textarea className="form-control" rows="3" value={visitForm.notes} onChange={e => setVisitForm({ ...visitForm, notes: e.target.value })}></textarea>.
                             </div>
                             <div className="d-flex">
                                 <button className="btn btn-success me-2" onClick={handleVisitUpdate}>Değişiklikleri Kaydet</button>

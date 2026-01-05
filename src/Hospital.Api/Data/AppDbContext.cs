@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<Patient> Patients { get; set; }
     public DbSet<Visit> Visits { get; set; }
     public DbSet<Prescription> Prescriptions { get; set; }
+    public DbSet<OneriAi> OneriAis { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -105,5 +106,8 @@ public class AppDbContext : DbContext
                 CreatedAt = fixedDate.AddDays(-10)
             }
         );
+
+        
+        
     }
 }
