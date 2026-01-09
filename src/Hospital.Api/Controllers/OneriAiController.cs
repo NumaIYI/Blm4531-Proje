@@ -10,22 +10,19 @@ namespace Hospital.Api.Controllers
     public class OneriAiController : ControllerBase
     {
         private readonly IOneriAiService _oneriAiService;
-
+    
         public OneriAiController(IOneriAiService oneriAiService)
         {
             _oneriAiService = oneriAiService;
         }
-
-        [HttpGet("ai")]
-        [Authorize(Roles = "Doctor")]
-        public async Task<IActionResult> GetRandomSuggestion()
+    
+        [HttpPost("analiz-et")]
+        public async Task<IActionResult> AnalizEt([FromBody] string diagnosis)
         {
-            var suggestion = await _oneriAiService.GetRandomSuggestionAsync();
-            if (suggestion == null)
-            {
-                return NotFound("No suggestions available.");
-            }
-            return Ok(suggestion);
+            if (string.IsNullOrEmpty(diagnosis)) return BadRequest("Tanı boş olamaz.");
+    
+            var sonuc = await _oneriAiService.GetOneriFromAiAsync(notlar);
+            return Ok(new { oneri = sonuc });
         }
     }
 }
