@@ -3,7 +3,7 @@
 A web-based application for managing patient records in a hospital. This system allows doctors to manage patient information, track visits, and write prescriptions.
 
 # Youtube video link:
-https://youtu.be/BwziIiJfS4Y
+https://youtu.be/uYKuSVDNpVo
 
 ## Features
 
